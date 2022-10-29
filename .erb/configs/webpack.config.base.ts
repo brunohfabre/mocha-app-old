@@ -2,9 +2,11 @@
  * Base webpack config used across other specific configs
  */
 
-import webpack from 'webpack';
-import webpackPaths from './webpack.paths';
-import { dependencies as externals } from '../../release/app/package.json';
+import path from 'path'
+import webpack from 'webpack'
+
+import { dependencies as externals } from '../../release/app/package.json'
+import webpackPaths from './webpack.paths'
 
 const configuration: webpack.Configuration = {
   externals: [...Object.keys(externals || {})],
@@ -41,6 +43,18 @@ const configuration: webpack.Configuration = {
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     modules: [webpackPaths.srcPath, 'node_modules'],
+    alias: {
+      '@assets': path.join(__dirname, '../../src/renderer/assets'),
+      '@components': path.join(__dirname, '../../src/renderer/components'),
+      '@contexts': path.join(__dirname, '../../src/renderer/contexts'),
+      '@hooks': path.join(__dirname, '../../src/renderer/hooks'),
+      '@pages': path.join(__dirname, '../../src/renderer/pages'),
+      '@routes': path.join(__dirname, '../../src/renderer/routes'),
+      '@utils': path.join(__dirname, '../../src/renderer/utils'),
+      '@lib': path.join(__dirname, '../../src/renderer/lib'),
+      '@styles': path.join(__dirname, '../../src/renderer/styles'),
+      '@services': path.join(__dirname, '../../src/renderer/services'),
+    },
   },
 
   plugins: [
@@ -48,6 +62,6 @@ const configuration: webpack.Configuration = {
       NODE_ENV: 'production',
     }),
   ],
-};
+}
 
-export default configuration;
+export default configuration

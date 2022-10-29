@@ -1,6 +1,6 @@
 {
   "name": "mocha",
-  "version": "0.0.1",
+  "version": "0.0.9",
   "description": "Simple and easy SQL client, REST client and notes app.",
   "license": "MIT",
   "author": {
