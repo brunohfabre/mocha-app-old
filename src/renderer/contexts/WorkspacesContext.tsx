@@ -80,12 +80,12 @@ export function WorkspacesContextProvider({
           } else {
             setWorkspaceSelected(null)
 
-            navigate('/workspaces/select')
+            navigate('/workspaces')
           }
         } else {
           setWorkspaces([])
 
-          navigate('/workspaces/create')
+          navigate('/workspaces')
 
           setWorkspaceSelected(null)
         }

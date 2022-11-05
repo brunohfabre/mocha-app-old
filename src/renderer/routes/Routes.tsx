@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { DefaultLayout } from '@components/Layouts/DefaultLayout'
 import { InternalLayout } from '@components/Layouts/InternalLayout'
 import { CodeVerification } from '@pages/CodeVerification'
+import { ForgotPassword } from '@pages/ForgotPassword'
 import { Home } from '@pages/Home'
 import { Notes } from '@pages/Notes'
 import { Note } from '@pages/Notes/Note'
@@ -11,6 +12,7 @@ import { Settings } from '@pages/Settings'
 import { SignIn } from '@pages/SignIn'
 import { SignUp } from '@pages/SignUp'
 import { Test } from '@pages/Test'
+import { Workspaces } from '@pages/Workspaces'
 import { WorkspaceCreate } from '@pages/Workspaces/Create'
 import { WorkspaceSelect } from '@pages/Workspaces/Select'
 import { WorkspaceSettings } from '@pages/Workspaces/Settings'
@@ -24,6 +26,7 @@ export function Router() {
 
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/sign-up" element={<SignUp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route path="/code-verification" element={<CodeVerification />} />
 
@@ -48,6 +51,7 @@ export function Router() {
         </Route>
 
         <Route path="/workspaces" element={<InternalLayout />}>
+          <Route path="" element={<Workspaces />} />
           <Route path="settings" element={<WorkspaceSettings />} />
         </Route>
 

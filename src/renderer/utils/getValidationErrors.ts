@@ -1,17 +1,15 @@
-import { ValidationError } from 'yup'
+import { z } from 'zod'
 
-interface Errors {
+type Errors = {
   [key: string]: string
 }
 
-export default function getValidationErrors(err: ValidationError): Errors {
+export function getValidationErrors(err: z.ZodError): Errors {
   const validationErrors: Errors = {}
 
-  err.inner.forEach((error) => {
-    if (error.path) {
-      validationErrors[error.path] = error.message
-    }
-  })
+  err.issues.forEach(
+    (error) => (validationErrors[error.path[0]] = error.message),
+  )
 
   return validationErrors
 }

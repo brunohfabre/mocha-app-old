@@ -2,12 +2,22 @@ import { styled } from '@styles/index'
 import { Form as UForm } from '@unform/web'
 
 export const Container = styled('div', {
-  flex: 1,
+  maxWidth: 1280,
+  width: '100%',
+  margin: '0 auto',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
   alignItems: 'center',
-  gap: 32,
+  justifyContent: 'space-between',
+  padding: '0 16px',
+
+  section: {
+    width: '100%',
+    height: 64,
+
+    display: 'flex',
+    alignItems: 'center',
+  },
 })
 
 export const Form = styled(UForm, {
@@ -19,9 +29,4 @@ export const Form = styled(UForm, {
   button: {
     marginTop: 24,
   },
-})
-
-export const Control = styled('div', {
-  display: 'flex',
-  justifyContent: 'flex-end',
 })

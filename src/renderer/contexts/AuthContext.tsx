@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useEffect, useRef, useState } from 'react'
+import { createContext, ReactNode, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useLoading } from '@hooks/LoadingHook'
@@ -35,7 +35,6 @@ type UpdateProfileData = {
 type AuthContextData = {
   user: User | null
   isSigned: boolean
-  isLoading: boolean
   signIn: (data: SignInData) => Promise<void>
   signUp: (data: SignUpData) => Promise<void>
   signOut: () => void
@@ -51,12 +50,8 @@ type AuthContextProviderProps = {
 export const AuthContext = createContext({} as AuthContextData)
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
-  const initialRender = useRef(true)
-
   const navigate = useNavigate()
   const { setLoading } = useLoading()
-
-  const [isLoading, setIsLoading] = useState(true)
 
   const [user, setUser] = useState<User | null>(() => {
     const persistedUser = localStorage.getItem('@mocha:user')
@@ -79,65 +74,19 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
   const isSigned = !!user && !!token
 
-  useEffect(() => {
-    async function loadSignedUser() {
-      try {
-        const response = await api.get('/sessions')
-
-        const newAvatarUrl: string = response.data.avatarUrl.includes('http')
-          ? response.data.avatarUrl
-          : `${baseURL}/files/${response.data.avatarUrl}`
-
-        const newUser = {
-          ...response.data,
-          avatarUrl: newAvatarUrl,
-        }
-
-        setUser(newUser)
-
-        localStorage.setItem('@mocha:user', JSON.stringify(newUser))
-      } catch (err) {
-        signOut()
-      } finally {
-        initialRender.current = false
-
-        setIsLoading(false)
-      }
-    }
-
-    if (isSigned && initialRender.current) {
-      loadSignedUser()
-    } else {
-      setIsLoading(false)
-    }
-  }, [isSigned])
-
   async function signIn(data: SignInData) {
     try {
       setLoading(true)
 
       const response = await api.post('/sessions', data)
 
-      const newAvatarUrl: string = response.data.user.avatarUrl.includes('http')
-        ? response.data.user.avatarUrl
-        : `${baseURL}/files/${response.data.user.avatarUrl}`
-
-      const newUser = {
-        ...response.data.user,
-        avatarUrl: newAvatarUrl,
-      }
-
-      setUser(newUser)
+      setUser(response.data.user)
       setToken(response.data.token)
 
-      localStorage.setItem('@mocha:user', JSON.stringify(newUser))
+      localStorage.setItem('@mocha:user', JSON.stringify(response.data.user))
       localStorage.setItem('@mocha:token', JSON.stringify(response.data.token))
 
-      navigate('/code-verification', {
-        state: {
-          redirectTo: '/',
-        },
-      })
+      navigate('/')
     } finally {
       setLoading(false)
     }
@@ -155,11 +104,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       localStorage.setItem('@mocha:user', JSON.stringify(response.data.user))
       localStorage.setItem('@mocha:token', JSON.stringify(response.data.token))
 
-      navigate('/code-verification', {
-        state: {
-          redirectTo: '/',
-        },
-      })
+      navigate('/')
     } finally {
       setLoading(false)
     }
@@ -235,7 +180,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       value={{
         user,
         isSigned,
-        isLoading,
         signIn,
         signUp,
         signOut,

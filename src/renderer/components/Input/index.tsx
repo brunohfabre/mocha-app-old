@@ -23,7 +23,7 @@ export default function Input({ name, label, ...rest }: InputProps) {
       name: fieldName,
       ref: inputRef,
       getValue: (ref) => {
-        return ref.current.value
+        return ref.current.value ? ref.current.value : null
       },
       setValue: (ref, value) => {
         ref.current.value = value

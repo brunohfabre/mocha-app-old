@@ -2,30 +2,36 @@ import { useContext, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
 import { FormHandles } from '@unform/core'
-import * as yup from 'yup'
+import { z } from 'zod'
 
 import { Button } from '@components/Button'
 import { Heading } from '@components/Heading'
 import Input from '@components/Input'
 import { Text } from '@components/Text'
 import { AuthContext } from '@contexts/AuthContext'
-import getValidationErrors from '@utils/getValidationErrors'
+import { getValidationErrors } from '@utils/getValidationErrors'
 
 import { Container, Form } from './styles'
 
-const signUpFormSchema = yup.object({
-  name: yup.string().required(),
-  phone: yup.string().required(),
-  email: yup.string().email().required(),
-  password: yup.string().min(6).required(),
-  passwordConfirmation: yup
-    .string()
-    .min(6)
-    .required()
-    .oneOf([yup.ref('password'), null], 'Passwords must match'),
-})
+const signUpFormSchema = z
+  .object({
+    name: z.string(),
+    phone: z.string(),
+    email: z.string().email(),
+    password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+  })
+  .superRefine((val, ctx) => {
+    if (val.password !== val.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Passwords don't match",
+        path: ['confirmPassword'],
+      })
+    }
+  })
 
-type SignUpFormInputs = yup.InferType<typeof signUpFormSchema>
+type SignUpFormInputs = z.infer<typeof signUpFormSchema>
 
 export function SignUp() {
   const formRef = useRef<FormHandles>(null)
@@ -36,16 +42,13 @@ export function SignUp() {
     try {
       formRef.current?.setErrors({})
 
-      await signUpFormSchema.validate(data, {
-        abortEarly: false,
-      })
+      signUpFormSchema.parse(data)
 
       await signUp(data)
     } catch (err) {
-      if (err instanceof yup.ValidationError) {
-        const errors = getValidationErrors(err)
-
-        formRef.current?.setErrors(errors)
+      if (err instanceof z.ZodError) {
+        console.log(err.issues)
+        formRef.current?.setErrors(getValidationErrors(err))
       }
     }
   }
@@ -71,7 +74,7 @@ export function SignUp() {
           placeholder="password"
         />
         <Input
-          name="passwordConfirmation"
+          name="confirmPassword"
           type="password"
           label="password confirmation"
           placeholder="password confirmation"
@@ -80,7 +83,10 @@ export function SignUp() {
       </Form>
 
       <Text size="sm">
-        Already have an account? <Link to="/sign-in">Sign in</Link>
+        Already have an account?{' '}
+        <Link to="/sign-in" replace>
+          Sign in
+        </Link>
       </Text>
     </Container>
   )

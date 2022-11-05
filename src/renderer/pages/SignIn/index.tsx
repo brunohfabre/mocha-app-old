@@ -2,23 +2,23 @@ import { useContext, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
 import { FormHandles } from '@unform/core'
-import * as yup from 'yup'
+import { z } from 'zod'
 
 import { Button } from '@components/Button'
 import { Heading } from '@components/Heading'
 import Input from '@components/Input'
 import { Text } from '@components/Text'
 import { AuthContext } from '@contexts/AuthContext'
-import getValidationErrors from '@utils/getValidationErrors'
+import { getValidationErrors } from '@utils/getValidationErrors'
 
-import { Container, Form } from './styles'
+import { Container, Control, Form } from './styles'
 
-const signInFormSchema = yup.object({
-  email: yup.string().email().required(),
-  password: yup.string().required(),
+const signInFormSchema = z.object({
+  email: z.string(),
+  password: z.string(),
 })
 
-type SignInFormInputs = yup.InferType<typeof signInFormSchema>
+type SignInFormInputs = z.infer<typeof signInFormSchema>
 
 export function SignIn() {
   const formRef = useRef<FormHandles>(null)
@@ -29,16 +29,12 @@ export function SignIn() {
     try {
       formRef.current?.setErrors({})
 
-      await signInFormSchema.validate(data, {
-        abortEarly: false,
-      })
+      signInFormSchema.parse(data)
 
       signIn(data)
     } catch (err) {
-      if (err instanceof yup.ValidationError) {
-        const errors = getValidationErrors(err)
-
-        formRef.current?.setErrors(errors)
+      if (err instanceof z.ZodError) {
+        formRef.current?.setErrors(getValidationErrors(err))
       }
     }
   }
@@ -56,6 +52,11 @@ export function SignIn() {
           label="password"
           placeholder="password"
         />
+        <Control>
+          <Text size="sm">
+            <Link to="/forgot-password">Forgot password</Link>
+          </Text>
+        </Control>
 
         <Button type="submit">Sign In</Button>
       </Form>
